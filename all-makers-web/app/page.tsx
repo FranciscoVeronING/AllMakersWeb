@@ -1,15 +1,23 @@
 import Navbar from '../components/Navbar';
 import ProductCard from '../components/ProductCard';
+import Database from 'better-sqlite3';
+
+function getProductosDesdeDB() {
+    const db = new Database('allmakers.db');
+
+  const stmt = db.prepare(`
+  SELECT p.id, p.nombre, p.imagen_url as imagen, MIN(v.precio) as precio
+  FROM productos p
+  LEFT JOIN variantes v ON p.id = v.producto_id
+  WHERE p.activo = 1
+  GROUP BY p.id 
+  `);
+
+  return stmt.all();
+}
 
 export default function Home() {
-  // Simulamos los datos que luego vendrán de una consulta a la BD
-  const productosDb = [
-    { id: 1, nombre: "Maceta Suculenta", precio: 120, imagen: "/p1.jpg" },
-    { id: 2, nombre: "Soporte Auriculares", precio: 350, imagen: "/p1.jpg" },
-    { id: 3, nombre: "Llavero Personalizado", precio: 80, imagen: "/p1.jpg" },
-    // ...
-  ];
-
+  const product = getProductosDesdeDB();
   return (
     <>
       <Navbar />
@@ -18,7 +26,7 @@ export default function Home() {
         <h1>Todos los Productos</h1>
 
         <div className="grid">
-          {productosDb.map((product) => (
+          {product.map((product) => (
             <ProductCard 
               key={product.id}
               id={product.id}
