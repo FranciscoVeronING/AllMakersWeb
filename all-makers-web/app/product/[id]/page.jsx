@@ -34,7 +34,7 @@ export default async function ProductoPage({ params }) {
 
             <div className="maceta__contenido">
                 <p>{producto.descripcion}</p>
-                <FormCompra variantes={variantes} />
+                <FormCompra variantes={variantes} productoBase={producto} />
             </div>
         </div>
       </main>

@@ -1,14 +1,24 @@
 "use client";
 import { useState } from 'react';
+import { useCart } from '../context/CartContext';
+import ModalExito from './ModalExito';
 
-export default function FormCompra({ variantes }) {
+export default function FormCompra({ variantes, productoBase }) {
+  const { agregarAlCarrito } = useCart();
+
   const [varianteSeleccionada, setVarianteSeleccionada] = useState(null);
   const [cantidad, setCantidad] = useState(1);
+  const [mostrarModal, setMostrarModal] = useState(false);
 
   const handleSelectChange = (e) => {
     const idSeleccionado = parseInt(e.target.value);
     const varianteEncontrada = variantes.find(v => v.id === idSeleccionado);
     setVarianteSeleccionada(varianteEncontrada);
+  };
+
+  const handleAgregar = () => {
+    agregarAlCarrito(productoBase, varianteSeleccionada, cantidad);
+    setMostrarModal(true);
   };
 
   // --- LÓGICA DE VALIDACIÓN ---
@@ -19,6 +29,7 @@ export default function FormCompra({ variantes }) {
   const botonActivo = tieneVariante && cantidadValida && hayStock;
 
   return (
+    <>
     <form className="formulario">
         <select 
             className="formulario__campo" 
@@ -47,6 +58,7 @@ export default function FormCompra({ variantes }) {
             className="formulario__submit" 
             type="button"
             disabled={!botonActivo}
+            onClick={handleAgregar}
             style={{ 
                 opacity: botonActivo ? 1 : 0.5, 
                 cursor: botonActivo ? 'pointer' : 'not-allowed' 
@@ -61,5 +73,11 @@ export default function FormCompra({ variantes }) {
             }
         </button>
     </form>
+    <ModalExito 
+        isOpen={mostrarModal} 
+        onClose={() => setMostrarModal(false)} 
+        productoNombre={productoBase?.nombre}
+      />
+      </>
   );
 }
